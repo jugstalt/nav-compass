@@ -1,0 +1,56 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Nav Compass</title>
+  <meta name="description" content="Navigation Compass">
+  <meta name="author" content="Jürgen Gstaltmaier">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="src/css/nav-compass.css">
+
+</head>
+
+<body>
+    <div class="nav-compass">
+        <div class="nav-compass-arrow"></div>
+        <div class="nav-compass-circle"></div>
+        <div class="nav-compass-current-position"></div>
+        <div class="nav-compass-target-direction"></div>
+    </div>
+
+    <div class="nav-compass-target-info">
+        <div class="nav-compass-target-info-arrow">
+
+        </div>
+        <div class="nav-compass-target-info-text">
+            <div class="nav-compass-target-info-label">
+            </div>
+            <div class="nav-compass-target-info-distance">
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="src/js/nav-compass.js"></script>
+
+    <script type="text/javascript">
+        var compass=new navCompass();
+
+        var targetPos = null;
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if(urlParams.has('lat') && urlParams.has('lng')) {
+            targetPos={ lat: parseFloat(urlParams.get('lat')), lng: parseFloat(urlParams.get('lng')) };
+        }
+
+        if(urlParams.has('label')) {
+            document.querySelector('.nav-compass-target-info-label').innerHTML=urlParams.get('label'); 
+        }
+
+        compass.start(targetPos);
+    </script>
+</body>
+</html>
