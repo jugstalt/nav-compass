@@ -8,6 +8,14 @@ A simple Javascript compass widget for navigating to a location with coordinates
 var compass = new navCompass(document.querySelector('#compass'));
 compass.start({ lat: 47.0, lng: 15.5 }, 'Name of my target');
 
+// optional:
+// Report current position (from geolocation api) and direction to target
+compass.onPositionChanged = function (position, direction) {
+    console.log('new position', position);
+    console.log('new direction', direction);
+};
+
+
 // release all event listeners (release geolocation handler...)
 compass.stop();
 ```

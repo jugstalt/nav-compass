@@ -18,16 +18,15 @@ var navCompass = function(targetElement) {
             <div class="nav-compass-target-info-distance">
             </div>
         </div>
-    </div>`
-
-
-    console.log(targetElement);
+    </div>`;
 
     const compassCircle = document.querySelector(".nav-compass-circle");
     const myPoint = document.querySelector(".nav-compass-current-position");
     const targetDirection = document.querySelector('.nav-compass-target-direction');
     const targetDistanceElement = document.querySelector('.nav-compass-target-info-distance');
     const infoArrow = document.querySelector(".nav-compass-target-info-arrow");
+
+    const me = this;
 
     let compass;
     let targetPoint;
@@ -63,7 +62,6 @@ var navCompass = function(targetElement) {
         isStarted = true;
 
         if(targetPoint) {
-            console.log('targetPoint', targetPoint);
             navigator.geolocation.getCurrentPosition(locationHandler);
         }
     }
@@ -77,6 +75,8 @@ var navCompass = function(targetElement) {
             window.removeEventListener("deviceorientationabsolute", orientationHandler);
         }
     };
+
+    this.onPositionChanged = null;
 
     function orientationHandler(e) {
         compass = e.webkitCompassHeading || Math.abs(e.alpha - 360);
@@ -102,13 +102,13 @@ var navCompass = function(targetElement) {
     let pointDistance = null;
 
     function locationHandler(position) {
-        console.log('receive position', position);
+        //console.log('receive position', position);
 
         const { latitude, longitude } = position.coords;
         pointDegree = calcDegreeToPoint(latitude, longitude);
         pointDistance = calcSphericDistance(latitude, longitude);
 
-        console.log('pointDistance', pointDistance);
+        //console.log('pointDistance', pointDistance);
         targetDistanceElement.innerHTML=`${ Math.round(pointDistance) }m (+/- ${ Math.round(position.coords.accuracy) }m)`
 
         if (pointDegree < 0) {
@@ -116,6 +116,10 @@ var navCompass = function(targetElement) {
         }
 
         targetDirection.style.opacity = 1;
+
+        if(me.onPositionChanged) {
+            me.onPositionChanged(position, pointDegree);
+        }
 
         if(isStarted) {
 
@@ -139,7 +143,7 @@ var navCompass = function(targetElement) {
                 Math.sin(phi) * Math.cos(lambdaK - lambda)
             );
 
-        console.log('psi', psi);
+        //console.log('psi', psi);
         return Math.round(psi);
     }
 
