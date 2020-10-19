@@ -9,10 +9,11 @@ var compass = new navCompass(document.querySelector('#compass'));
 compass.start({ lat: 47.0, lng: 15.5 }, 'Name of my target');
 
 // optional:
-// Report current position (from geolocation api) and direction to target
-compass.onPositionChanged = function (position, direction) {
+// Report current position (from geolocation api), compass direction and direction to target
+compass.onPositionChanged = function (position, compassDirection, pointDirection) {
     console.log('new position', position);
-    console.log('new direction', direction);
+    console.log('current compass direction', compassDirection);
+    console.log('current direction to point', pointDirection);
 };
 
 

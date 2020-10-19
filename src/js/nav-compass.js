@@ -83,11 +83,7 @@ var navCompass = function(targetElement) {
         compassCircle.style.transform = `translate(-50%, -50%) rotate(${ -compass }deg)`;
 
         if(pointDegree !== null) {
-            if (
-                (pointDegree < Math.abs(compass) && pointDegree + 15 > Math.abs(compass)) ||
-                pointDegree > Math.abs(compass + 15) ||
-                pointDegree < Math.abs(compass)
-            ) {
+            if (calcAbsoluteAngleDifference(pointDegree, compass) > 15) {
                myPoint.style.opacity = 0;
             } else if (pointDegree) {
                myPoint.style.opacity = 1;
@@ -118,7 +114,7 @@ var navCompass = function(targetElement) {
         targetDirection.style.opacity = 1;
 
         if(me.onPositionChanged) {
-            me.onPositionChanged(position, pointDegree);
+            me.onPositionChanged(position, compass, pointDegree);
         }
 
         if(isStarted) {
@@ -160,5 +156,17 @@ var navCompass = function(targetElement) {
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = R * c; // Distance in m
         return d;
+    };
+
+    function calcAbsoluteAngleDifference(a1, a2) {
+        a1 = a1 * Math.PI / 180.0;
+        a2 = a2 * Math.PI / 180.0;
+
+        var v1 = [ Math.cos(a1), Math.sin(a1) ];
+        var v2 = [ Math.cos(a2), Math.sin(a2) ];
+
+        var cos_a = v1[0]*v2[0]+v1[1]*v2[1];
+
+        return Math.abs(Math.acos(cos_a)*180.0/Math.PI);
     };
 };
