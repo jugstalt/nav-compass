@@ -1,4 +1,28 @@
-var navCompass = function() {
+var navCompass = function(targetElement) {
+
+    targetElement.innerHTML =
+    `<div class="nav-compass">
+        <div class="nav-compass-arrow"></div>
+        <div class="nav-compass-circle"></div>
+        <div class="nav-compass-current-position"></div>
+        <div class="nav-compass-target-direction"></div>
+    </div>
+
+    <div class="nav-compass-target-info">
+        <div class="nav-compass-target-info-arrow">
+
+        </div>
+        <div class="nav-compass-target-info-text">
+            <div class="nav-compass-target-info-label">
+            </div>
+            <div class="nav-compass-target-info-distance">
+            </div>
+        </div>
+    </div>`
+
+
+    console.log(targetElement);
+
     const compassCircle = document.querySelector(".nav-compass-circle");
     const myPoint = document.querySelector(".nav-compass-current-position");
     const targetDirection = document.querySelector('.nav-compass-target-direction');
@@ -7,14 +31,21 @@ var navCompass = function() {
 
     let compass;
     let targetPoint;
+    let isStarted = false;
     
     const isIOS = (
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/)
     );
 
-    this.start = function(target) {
-        targetPoint=target;
+    this.start = function(navPoint, label) {
+        
+        targetPoint=navPoint;
+
+        if(label) {
+            document.querySelector('.nav-compass-target-info-label').innerHTML=label;
+        }
+
         if (isIOS) {
           DeviceOrientationEvent.requestPermission()
             .then((response) => {
@@ -29,15 +60,27 @@ var navCompass = function() {
           window.addEventListener("deviceorientationabsolute", orientationHandler, true);
         }
 
+        isStarted = true;
+
         if(targetPoint) {
             console.log('targetPoint', targetPoint);
             navigator.geolocation.getCurrentPosition(locationHandler);
         }
     }
 
+    this.stop = function() {
+        isStarted = false;
+
+        if(isIOS) {
+            window.addEventListener("deviceorientation", orientationHandler);
+        } else {
+            window.removeEventListener("deviceorientationabsolute", orientationHandler);
+        }
+    };
+
     function orientationHandler(e) {
         compass = e.webkitCompassHeading || Math.abs(e.alpha - 360);
-        compassCircle.style.transform = `translate(-50%, -50%) rotate(${-compass}deg)`;
+        compassCircle.style.transform = `translate(-50%, -50%) rotate(${ -compass }deg)`;
 
         if(pointDegree !== null) {
             if (
@@ -74,9 +117,13 @@ var navCompass = function() {
 
         targetDirection.style.opacity = 1;
 
-        setTimeout(function(){
-            navigator.geolocation.getCurrentPosition(locationHandler);
-        },1000);
+        if(isStarted) {
+
+            setTimeout(function(){
+                navigator.geolocation.getCurrentPosition(locationHandler);
+            },1000);
+
+        }
     }
 
     function calcDegreeToPoint(latitude, longitude) {
